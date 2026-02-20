@@ -65,9 +65,10 @@ input:focus {
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s ease;
-    .register-btn {
-    font-weight: 300;
 }
+
+.register-btn {
+    font-weight: 300;
 }
 
 .login-btn {
