@@ -55,12 +55,13 @@ input:focus {
 }
 
 .login-btn {
-    width: 100%;
-    padding: 15px;
-    margin-top: 20px;
+    width: 70%;
+    padding: 12px;
+    margin: 20px auto 0 auto;
+    display: block;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
@@ -74,11 +75,12 @@ input:focus {
 }
 
 .register-btn {
-    width: 100%;
-    padding: 15px;
-    margin-top: 15px;
+    width: 70%;
+    padding: 12px;
+    margin: 12px auto 0 auto;
+    display: block;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.05);
