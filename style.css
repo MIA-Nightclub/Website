@@ -67,10 +67,6 @@ input:focus {
     transition: 0.3s ease;
 }
 
-.register-btn {
-    font-weight: 300;
-}
-
 .login-btn {
     border: none;
     background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
@@ -94,3 +90,8 @@ input:focus {
     transform: scale(1.05);
     box-shadow: 0 0 15px #a100ff;
 }
+
+.register-btn {
+    font-weight: 300;
+}
+
