@@ -56,7 +56,7 @@ input:focus {
 
 .login-btn,
 .register-btn {
-    width: 120px;        /* feste Breite */
+    width: 180px;        /* feste Breite */
     padding: 12px;
     margin: 12px auto 0 auto;
     display: block;
