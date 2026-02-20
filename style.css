@@ -9,10 +9,12 @@ body {
     height: 100vh;
 }
 
+/* Container */
 .login-container {
     text-align: center;
 }
 
+/* Logo */
 .logo {
     font-size: 90px;
     font-weight: 900;
@@ -29,6 +31,7 @@ body {
     font-size: 14px;
 }
 
+/* Login Box */
 .login-box {
     margin-top: 40px;
     background: rgba(255, 255, 255, 0.05);
@@ -38,6 +41,7 @@ body {
     box-shadow: 0 0 40px rgba(255, 0, 150, 0.2);
 }
 
+/* Inputs */
 input {
     width: 250px;
     padding: 15px;
@@ -54,9 +58,10 @@ input:focus {
     box-shadow: 0 0 10px #a100ff;
 }
 
+/* Gemeinsamer Button-Style */
 .login-btn,
 .register-btn {
-    width: 180px;
+    width: 120px;
     padding: 12px;
     margin: 12px auto 0 auto;
     display: block;
@@ -66,6 +71,7 @@ input:focus {
     transition: 0.3s ease;
 }
 
+/* Login Button */
 .login-btn {
     font-weight: 700;
     border: none;
@@ -78,16 +84,16 @@ input:focus {
     box-shadow: 0 0 20px #a100ff;
 }
 
+/* Register Button */
 .register-btn {
-    font-weight: 100;
+    font-weight: 300;
     background: rgba(255, 255, 255, 0.05);
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
 .register-btn:hover {
     background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
     transform: scale(1.05);
     box-shadow: 0 0 15px #a100ff;
 }
-
-
