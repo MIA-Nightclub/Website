@@ -40,6 +40,11 @@
     function closeRegister() {
         overlay.classList.remove("active");
     }
+    overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+        closeRegister();
+    }
+});
 </script>
     </div>
 
