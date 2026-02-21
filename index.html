@@ -18,6 +18,29 @@
             <button class="login-btn">Login</button>
 <button class="register-btn">Registrieren</button>
         </div>
+        
+        <div class="register-overlay" id="registerOverlay">
+    <div class="register-box">
+        <h2>Registrieren</h2>
+        <input type="text" placeholder="Benutzername">
+        <input type="password" placeholder="Passwort">
+        <input type="password" placeholder="Passwort wiederholen">
+        <button class="login-btn">Account erstellen</button>
+        <button class="close-btn" onclick="closeRegister()">Abbrechen</button>
+    </div>
+</div>
+
+<script>
+    const overlay = document.getElementById("registerOverlay");
+
+    document.querySelector(".register-btn").addEventListener("click", () => {
+        overlay.classList.add("active");
+    });
+
+    function closeRegister() {
+        overlay.classList.remove("active");
+    }
+</script>
     </div>
 
 </body>
