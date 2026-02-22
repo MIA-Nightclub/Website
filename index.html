@@ -159,15 +159,51 @@ function buildUserSession(userData) {
         };
     }
 
-    showInfoScreen();
-}
-
 function showInfoScreen() {
+
+    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [
+        {
+            id: 1,
+            title: "Techno Night",
+            date: "2026-02-22",
+            description: "Hard Techno & Neon Vibes",
+            image: "https://picsum.photos/800/500?1"
+        },
+        {
+            id: 2,
+            title: "Latin Party",
+            date: "2026-02-25",
+            description: "Reggaeton & Latin Hits",
+            image: "https://picsum.photos/800/500?2"
+        }
+    ];
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // Alte Events entfernen
+    EVENTS = EVENTS.filter(event => event.date >= today);
+
+    // Nach Datum sortieren
+    EVENTS.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+    // Maximal 6 Events
+    EVENTS = EVENTS.slice(0,6);
+
+    localStorage.setItem("mia_events", JSON.stringify(EVENTS));
+
     document.body.innerHTML = `
-        <div style="text-align:center; padding-top:100px;">
-            <h1>Willkommen ${currentUser.username}</h1>
-            <p>Rolle: ${currentUser.role}</p>
-            <p>Rechte: ${currentUser.permissions === "ALL" ? "ALLE RECHTE" : currentUser.permissions.join(", ")}</p>
+        <div class="event-container">
+            ${EVENTS.map((event, index) => `
+                <div class="event-card ${index === 0 ? "today" : ""}">
+                    <div class="event-bg" style="background-image:url('${event.image}')"></div>
+                    <div class="event-content">
+                        <img src="${event.image}" class="event-image">
+                        <h2>${event.title}</h2>
+                        <p>${event.date}</p>
+                        <p>${event.description}</p>
+                    </div>
+                </div>
+            `).join("")}
         </div>
     `;
 }
