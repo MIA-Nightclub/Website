@@ -8,38 +8,55 @@
 </head>
 <body>
 
-    <div class="login-container">
-        <h1 class="logo">MIA</h1>
-        <p class="subtitle">nightclub system</p>
+<div class="login-container">
+    <h1 class="logo">MIA</h1>
+    <p class="subtitle">nightclub system</p>
 
-        <div class="login-box">
-            <input type="text" placeholder="Benutzername">
-            <input type="password" placeholder="Passwort">
-            <button class="login-btn">Login</button>
-<button class="register-btn">Registrieren</button>
-        </div>
-        
-        <div class="register-overlay" id="registerOverlay">
-    <div class="register-box">
-        <h2>Registrieren</h2>
+    <div class="login-box">
         <input type="text" placeholder="Benutzername">
         <input type="password" placeholder="Passwort">
-        <input type="password" placeholder="Passwort wiederholen">
-        <button class="login-btn">Account erstellen</button>
-        <button class="close-btn" onclick="closeRegister()">Abbrechen</button>
+        <button class="login-btn" onclick="fakeLogin()">Login</button>
+        <button class="register-btn">Registrieren</button>
+    </div>
+
+    <div class="register-overlay" id="registerOverlay">
+        <div class="register-box">
+            <h2>Registrieren</h2>
+            <input type="text" placeholder="Benutzername">
+            <input type="password" placeholder="Passwort">
+            <input type="password" placeholder="Passwort wiederholen">
+            <button class="login-btn">Account erstellen</button>
+            <button class="close-btn" onclick="closeRegister()">Abbrechen</button>
+        </div>
     </div>
 </div>
 
-    </div>
+<script>
 
-</body>
-        <script>
+/* ===========================
+   REGISTER POPUP LOGIC
+=========================== */
+
+const overlay = document.getElementById("registerOverlay");
+
+document.querySelector(".register-btn").addEventListener("click", () => {
+    overlay.classList.add("active");
+});
+
+function closeRegister() {
+    overlay.classList.remove("active");
+}
+
+overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+        closeRegister();
+    }
+});
 
 /* ===========================
    SYSTEM KERNEL
 =========================== */
 
-/* Rechte Definition */
 const PERMISSIONS = {
     VIEW_INFO: "view_info",
     EDIT_INFO: "edit_info",
@@ -50,7 +67,6 @@ const PERMISSIONS = {
     ACCESS_RUNNER: "access_runner"
 };
 
-/* Rollen Definition */
 const ROLES = {
     GOD: {
         name: "god",
@@ -93,7 +109,6 @@ const ROLES = {
     }
 };
 
-/* Fake Benutzer Daten */
 const USERS = [
     { username: "melven", roles: ["god"] },
     { username: "kevin", roles: ["superadmin"] },
@@ -102,10 +117,8 @@ const USERS = [
     { username: "tom", roles: ["runner"] }
 ];
 
-/* Aktuelle Session */
 let currentUser = null;
 
-/* Login Funktion */
 function fakeLogin() {
     const usernameInput = document
         .querySelector('.login-box input[type="text"]')
@@ -121,7 +134,6 @@ function fakeLogin() {
     buildUserSession(foundUser);
 }
 
-/* Session Aufbau */
 function buildUserSession(userData) {
 
     if (userData.roles.includes("god")) {
@@ -150,7 +162,6 @@ function buildUserSession(userData) {
     showInfoScreen();
 }
 
-/* Info Screen Platzhalter */
 function showInfoScreen() {
     document.body.innerHTML = `
         <div style="text-align:center; padding-top:100px;">
@@ -162,5 +173,6 @@ function showInfoScreen() {
 }
 
 </script>
-        
+
+</body>
 </html>
