@@ -30,21 +30,134 @@
     </div>
 </div>
 
-<script>
-    const overlay = document.getElementById("registerOverlay");
+        <script>
 
-    document.querySelector(".register-btn").addEventListener("click", () => {
-        overlay.classList.add("active");
-    });
+/* ===========================
+   SYSTEM KERNEL
+=========================== */
 
-    function closeRegister() {
-        overlay.classList.remove("active");
+/* Rechte Definition */
+const PERMISSIONS = {
+    VIEW_INFO: "view_info",
+    EDIT_INFO: "edit_info",
+    MANAGE_USERS: "manage_users",
+    EDIT_DRINKS: "edit_drinks",
+    EDIT_SETTINGS: "edit_settings",
+    ACCESS_BARKEEPER: "access_barkeeper",
+    ACCESS_RUNNER: "access_runner"
+};
+
+/* Rollen Definition */
+const ROLES = {
+    GOD: {
+        name: "god",
+        permissions: "ALL"
+    },
+    SUPERADMIN: {
+        name: "superadmin",
+        permissions: [
+            PERMISSIONS.VIEW_INFO,
+            PERMISSIONS.EDIT_INFO,
+            PERMISSIONS.MANAGE_USERS,
+            PERMISSIONS.EDIT_DRINKS,
+            PERMISSIONS.EDIT_SETTINGS,
+            PERMISSIONS.ACCESS_BARKEEPER,
+            PERMISSIONS.ACCESS_RUNNER
+        ]
+    },
+    ADMIN: {
+        name: "admin",
+        permissions: [
+            PERMISSIONS.VIEW_INFO,
+            PERMISSIONS.EDIT_INFO,
+            PERMISSIONS.ACCESS_BARKEEPER,
+            PERMISSIONS.ACCESS_RUNNER
+        ]
+    },
+    BARKEEPER: {
+        name: "barkeeper",
+        permissions: [
+            PERMISSIONS.VIEW_INFO,
+            PERMISSIONS.ACCESS_BARKEEPER
+        ]
+    },
+    RUNNER: {
+        name: "runner",
+        permissions: [
+            PERMISSIONS.VIEW_INFO,
+            PERMISSIONS.ACCESS_RUNNER
+        ]
     }
-    overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) {
-        closeRegister();
+};
+
+/* Fake Benutzer Daten */
+const USERS = [
+    { username: "melven", roles: ["god"] },
+    { username: "kevin", roles: ["superadmin"] },
+    { username: "lisa", roles: ["admin"] },
+    { username: "max", roles: ["barkeeper"] },
+    { username: "tom", roles: ["runner"] }
+];
+
+/* Aktuelle Session */
+let currentUser = null;
+
+/* Login Funktion */
+function fakeLogin() {
+    const usernameInput = document
+        .querySelector('.login-box input[type="text"]')
+        .value.toLowerCase();
+
+    const foundUser = USERS.find(user => user.username === usernameInput);
+
+    if (!foundUser) {
+        alert("Unbekannter Benutzer");
+        return;
     }
-});
+
+    buildUserSession(foundUser);
+}
+
+/* Session Aufbau */
+function buildUserSession(userData) {
+
+    if (userData.roles.includes("god")) {
+        currentUser = {
+            username: userData.username,
+            role: "god",
+            permissions: "ALL"
+        };
+    } else {
+        let collectedPermissions = [];
+
+        userData.roles.forEach(roleName => {
+            const role = Object.values(ROLES).find(r => r.name === roleName);
+            if (role) {
+                collectedPermissions.push(...role.permissions);
+            }
+        });
+
+        currentUser = {
+            username: userData.username,
+            role: userData.roles[0],
+            permissions: [...new Set(collectedPermissions)]
+        };
+    }
+
+    showInfoScreen();
+}
+
+/* Info Screen Platzhalter */
+function showInfoScreen() {
+    document.body.innerHTML = `
+        <div style="text-align:center; padding-top:100px;">
+            <h1>Willkommen ${currentUser.username}</h1>
+            <p>Rolle: ${currentUser.role}</p>
+            <p>Rechte: ${currentUser.permissions === "ALL" ? "ALLE RECHTE" : currentUser.permissions.join(", ")}</p>
+        </div>
+    `;
+}
+
 </script>
     </div>
 
