@@ -5,10 +5,26 @@
 =========================== */
 
 const overlay = document.getElementById("registerOverlay");
+const registerBtn = document.querySelector(".register-btn");
 
-document.querySelector(".register-btn").addEventListener("click", () => {
-    overlay.classList.add("active");
-});
+if (overlay && registerBtn) {
+
+    registerBtn.addEventListener("click", () => {
+        overlay.classList.add("active");
+    });
+
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) {
+            closeRegister();
+        }
+    });
+}
+
+function closeRegister() {
+    if (overlay) {
+        overlay.classList.remove("active");
+    }
+}
 
 function closeRegister() {
     overlay.classList.remove("active");
