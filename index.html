@@ -8,270 +8,283 @@
 </head>
 <body>
 
-<div class="login-container">
-    <h1 class="logo">MIA</h1>
-    <p class="subtitle">nightclub system</p>
+<div id="app">
 
-    <div class="login-box">
-        <input type="text" id="usernameInput" placeholder="Benutzername">
-        <input type="password" placeholder="Passwort">
-        <button class="login-btn" onclick="fakeLogin()">Login</button>
+    <!-- GLOBAL OVERLAY -->
+    <div id="globalOverlay" class="overlay hidden"></div>
+
+    <!-- LOGIN VIEW -->
+    <div id="loginView" class="view active">
+        <h1 class="logo">MIA</h1>
+        <p class="subtitle">nightclub system</p>
+
+        <div class="login-box">
+            <input type="text" id="usernameInput" placeholder="Benutzername">
+            <input type="password" placeholder="Passwort">
+            <button class="login-btn" onclick="login()">Login</button>
+        </div>
     </div>
-</div>
 
-<script>
+    <!-- MAIN VIEW -->
+    <div id="mainView" class="view">
 
-/* ================= USER ================= */
-
-const USERS = [
-    { username: "melven", role: "god" },
-    { username: "kevin", role: "superadmin" },
-    { username: "lisa", role: "admin" }
-];
-
-let currentUser = null;
-let uploadedImageData = null;
-let editingEventId = null;
-
-/* ================= LOGIN ================= */
-
-function fakeLogin() {
-    const username = document.getElementById("usernameInput").value.toLowerCase();
-    const found = USERS.find(u => u.username === username);
-
-    if (!found) {
-        alert("Unbekannter Benutzer");
-        return;
-    }
-
-    currentUser = found;
-    showInfoScreen();
-}
-
-/* ================= INFO SCREEN ================= */
-
-function showInfoScreen() {
-
-    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
-
-    const today = new Date().toISOString().split("T")[0];
-    EVENTS = EVENTS.filter(e => e.date >= today);
-    EVENTS.sort((a,b) => new Date(a.date) - new Date(b.date));
-    EVENTS = EVENTS.slice(0,6);
-
-    localStorage.setItem("mia_events", JSON.stringify(EVENTS));
-
-    document.body.innerHTML = `
         <div class="top-bar">
             <div class="hamburger" onclick="toggleMenu()">☰</div>
         </div>
 
-        <div class="side-menu" id="sideMenu">
-            <div class="menu-header">MIA System</div>
-            ${currentUser.role === "god" ? `<div class="menu-item god-mode" onclick="openGodGate()">GOD Mode</div>` : ""}
-            <div class="menu-divider"></div>
-            <div class="menu-item logout-item" onclick="logout()">Logout</div>
-        </div>
+        <div id="eventContainer" class="event-container"></div>
 
-        <div class="event-container">
-            ${EVENTS.map((event, index) => `
-                <div class="event-card ${index===0?'today':''}">
-                    <div class="event-bg" style="background-image:url('${event.image}')"></div>
-                    <div class="event-content">
-                        <img src="${event.image}" class="event-image">
-                        <h2>${event.title}</h2>
-                        <p>${event.date}</p>
-                        <p>${event.description}</p>
-                        ${
-                            currentUser.role === "god" || currentUser.role === "superadmin"
-                            ? `<div class="event-actions">
-                                    <button onclick="editEvent(${event.id})">✏</button>
-                                    <button onclick="deleteEvent(${event.id})">🗑</button>
-                               </div>`
-                            : ""
-                        }
-                    </div>
-                </div>
-            `).join("")}
-        </div>
+        <div id="addButton" class="glass-add-btn hidden" onclick="openEventModal()">+</div>
+    </div>
 
-        ${
-            currentUser.role === "god" || currentUser.role === "superadmin"
-            ? `<div class="glass-add-btn" onclick="openEventModal()">+</div>`
-            : ""
-        }
+    <!-- SIDE MENU -->
+    <div id="sideMenu" class="side-menu">
+        <div class="menu-header">MIA System</div>
+        <div class="menu-item">Info</div>
+        <div class="menu-item">Barkeeper</div>
+        <div class="menu-item">Runner</div>
+        <div class="menu-item">Getränkekarte</div>
+        <div class="menu-item">Einstellungen</div>
+        <div id="godMenuItem" class="menu-item god-mode hidden" onclick="openGodGate()">GOD Mode</div>
+        <div class="menu-divider"></div>
+        <div class="menu-item logout-item" onclick="logout()">Logout</div>
+    </div>
 
-        <!-- EVENT MODAL -->
-        <div class="glass-modal" id="eventModal">
-            <div class="glass-modal-content">
-                <h2 id="modalTitle">Neues Event</h2>
-                <input type="text" id="eventTitle" placeholder="Titel">
-                <input type="date" id="eventDate">
+    <!-- EVENT MODAL -->
+    <div id="eventModal" class="modal hidden">
+        <div class="modal-box">
+            <h2 id="modalTitle">Neues Event</h2>
 
-                <div class="upload-area" id="uploadArea">
-                    <p>Bild hier reinziehen oder klicken</p>
-                    <input type="file" id="imageInput" accept="image/*" hidden>
-                </div>
+            <input type="text" id="eventTitle" placeholder="Titel">
+            <input type="date" id="eventDate">
 
-                <img id="imagePreview" class="image-preview">
-
-                <textarea id="eventDesc" placeholder="Beschreibung"></textarea>
-
-                <button class="login-btn" onclick="saveEvent()">Speichern</button>
-                <button class="close-btn" onclick="closeEventModal()">Abbrechen</button>
+            <div id="uploadArea" class="upload-area">
+                <p>Bild hier reinziehen oder klicken</p>
+                <input type="file" id="imageInput" accept="image/*" hidden>
             </div>
-        </div>
 
-        <!-- GOD PIN MODAL -->
-        <div class="glass-modal" id="godModal">
-            <div class="glass-modal-content">
-                <h2>GOD PIN</h2>
-                <input type="password" id="godPinInput" placeholder="4-stelliger PIN">
-                <button class="login-btn" onclick="checkGodPin()">Bestätigen</button>
-                <button class="close-btn" onclick="closeGodGate()">Abbrechen</button>
-            </div>
-        </div>
-    `;
+            <img id="imagePreview" class="image-preview">
 
-    setTimeout(setupImageUpload, 50);
+            <textarea id="eventDesc" placeholder="Beschreibung"></textarea>
+
+            <button class="login-btn" onclick="saveEvent()">Speichern</button>
+        </div>
+    </div>
+
+    <!-- GOD PIN MODAL -->
+    <div id="godModal" class="modal hidden">
+        <div class="modal-box">
+            <h2>GOD PIN</h2>
+            <input type="password" id="godPinInput" placeholder="4-stelliger PIN">
+            <button class="login-btn" onclick="checkGodPin()">Bestätigen</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+/* ================= SYSTEM ================= */
+
+const USERS = [
+    { username: "melven", role: "god" },
+    { username: "kevin", role: "superadmin" }
+];
+
+let currentUser = null;
+let uploadedImage = null;
+let editingEventId = null;
+
+/* ================= VIEW CONTROL ================= */
+
+function showView(id) {
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
 }
+
+/* ================= LOGIN ================= */
+
+function login() {
+    const name = document.getElementById("usernameInput").value.toLowerCase();
+    const user = USERS.find(u => u.username === name);
+
+    if (!user) return alert("Unbekannter Benutzer");
+
+    currentUser = user;
+    showView("mainView");
+    initMainUI();
+}
+
+/* ================= MAIN UI ================= */
+
+function initMainUI() {
+    if (currentUser.role === "god" || currentUser.role === "superadmin") {
+        document.getElementById("addButton").classList.remove("hidden");
+    }
+
+    if (currentUser.role === "god") {
+        document.getElementById("godMenuItem").classList.remove("hidden");
+    }
+
+    renderEvents();
+}
+
+/* ================= EVENTS ================= */
+
+function renderEvents() {
+
+    let events = JSON.parse(localStorage.getItem("mia_events")) || [];
+    const today = new Date().toISOString().split("T")[0];
+
+    events = events.filter(e => e.date >= today);
+    events.sort((a,b)=>new Date(a.date)-new Date(b.date));
+    events = events.slice(0,6);
+
+    localStorage.setItem("mia_events", JSON.stringify(events));
+
+    const container = document.getElementById("eventContainer");
+    container.innerHTML = events.map((event, i) => `
+        <div class="event-card ${i===0?'today':''}">
+            <div class="event-bg" style="background-image:url('${event.image}')"></div>
+            <div class="event-content">
+                <img src="${event.image}" class="event-image">
+                <h2>${event.title}</h2>
+                <p>${event.date}</p>
+                <p>${event.description}</p>
+
+                ${
+                    currentUser.role === "god" || currentUser.role === "superadmin"
+                    ? `<div class="event-actions">
+                           <button onclick="editEvent(${event.id})">Bearbeiten</button>
+                           <button onclick="deleteEvent(${event.id})">Löschen</button>
+                       </div>`
+                    : ""
+                }
+            </div>
+        </div>
+    `).join("");
+}
+
+/* ================= MODALS ================= */
+
+function openEventModal() {
+    editingEventId = null;
+    document.getElementById("eventModal").classList.remove("hidden");
+    document.getElementById("globalOverlay").classList.remove("hidden");
+}
+
+function openGodGate() {
+    document.getElementById("godModal").classList.remove("hidden");
+    document.getElementById("globalOverlay").classList.remove("hidden");
+}
+
+document.getElementById("globalOverlay").onclick = () => {
+    document.querySelectorAll(".modal").forEach(m => m.classList.add("hidden"));
+    document.getElementById("sideMenu").classList.remove("active");
+    document.getElementById("globalOverlay").classList.add("hidden");
+};
 
 /* ================= MENU ================= */
 
 function toggleMenu() {
     document.getElementById("sideMenu").classList.toggle("active");
+    document.getElementById("globalOverlay").classList.toggle("hidden");
 }
 
-function logout() {
-    location.reload();
-}
-
-/* ================= GOD PIN ================= */
-
-function openGodGate() {
-    document.getElementById("godModal").classList.add("active");
-}
-
-function closeGodGate() {
-    document.getElementById("godModal").classList.remove("active");
-}
+/* ================= GOD ================= */
 
 function checkGodPin() {
-    const pin = document.getElementById("godPinInput").value;
-    if (pin === "1337") {
-        alert("Willkommen im GOD Dashboard 😎");
-        closeGodGate();
+    if (document.getElementById("godPinInput").value === "1337") {
+        alert("GOD Dashboard coming soon 😎");
     } else {
         alert("Falscher PIN");
     }
 }
 
-/* ================= IMAGE UPLOAD ================= */
-
-function setupImageUpload() {
-    const uploadArea = document.getElementById("uploadArea");
-    const imageInput = document.getElementById("imageInput");
-    const preview = document.getElementById("imagePreview");
-
-    if (!uploadArea) return;
-
-    uploadArea.onclick = () => imageInput.click();
-
-    imageInput.onchange = e => handleFile(e.target.files[0]);
-
-    uploadArea.ondragover = e => {
-        e.preventDefault();
-        uploadArea.classList.add("dragging");
-    };
-
-    uploadArea.ondragleave = () => uploadArea.classList.remove("dragging");
-
-    uploadArea.ondrop = e => {
-        e.preventDefault();
-        uploadArea.classList.remove("dragging");
-        handleFile(e.dataTransfer.files[0]);
-    };
-
-    function handleFile(file) {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            uploadedImageData = event.target.result;
-            preview.src = uploadedImageData;
-            preview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-/* ================= EVENTS ================= */
-
-function openEventModal() {
-    editingEventId = null;
-    uploadedImageData = null;
-    document.getElementById("modalTitle").innerText = "Neues Event";
-    document.getElementById("eventModal").classList.add("active");
-}
-
-function closeEventModal() {
-    document.getElementById("eventModal").classList.remove("active");
-}
+/* ================= SAVE / EDIT / DELETE ================= */
 
 function saveEvent() {
+    let events = JSON.parse(localStorage.getItem("mia_events")) || [];
 
-    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
-
-    const eventData = {
+    const newEvent = {
         id: editingEventId || Date.now(),
-        title: document.getElementById("eventTitle").value,
-        date: document.getElementById("eventDate").value,
-        description: document.getElementById("eventDesc").value,
-        image: uploadedImageData || ""
+        title: eventTitle.value,
+        date: eventDate.value,
+        description: eventDesc.value,
+        image: uploadedImage || ""
     };
 
-    if (!eventData.title || !eventData.date) {
-        alert("Titel & Datum sind Pflicht!");
-        return;
-    }
+    if (!newEvent.title || !newEvent.date) return alert("Titel & Datum Pflicht");
 
     if (editingEventId) {
-        EVENTS = EVENTS.map(e => e.id === editingEventId ? eventData : e);
+        events = events.map(e => e.id === editingEventId ? newEvent : e);
     } else {
-        EVENTS.push(eventData);
+        events.push(newEvent);
     }
 
-    localStorage.setItem("mia_events", JSON.stringify(EVENTS));
-    closeEventModal();
-    showInfoScreen();
+    localStorage.setItem("mia_events", JSON.stringify(events));
+    closeAll();
+    renderEvents();
 }
 
 function editEvent(id) {
-    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
-    const event = EVENTS.find(e => e.id === id);
+    const events = JSON.parse(localStorage.getItem("mia_events")) || [];
+    const event = events.find(e => e.id === id);
 
     editingEventId = id;
-    uploadedImageData = event.image;
+    eventTitle.value = event.title;
+    eventDate.value = event.date;
+    eventDesc.value = event.description;
+    uploadedImage = event.image;
+    imagePreview.src = event.image;
+    imagePreview.style.display = "block";
 
-    document.getElementById("modalTitle").innerText = "Event bearbeiten";
-    document.getElementById("eventTitle").value = event.title;
-    document.getElementById("eventDate").value = event.date;
-    document.getElementById("eventDesc").value = event.description;
-
-    const preview = document.getElementById("imagePreview");
-    preview.src = event.image;
-    preview.style.display = "block";
-
-    document.getElementById("eventModal").classList.add("active");
+    openEventModal();
 }
 
 function deleteEvent(id) {
-    if (!confirm("Event wirklich löschen?")) return;
-
-    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
-    EVENTS = EVENTS.filter(e => e.id !== id);
-
-    localStorage.setItem("mia_events", JSON.stringify(EVENTS));
-    showInfoScreen();
+    if (!confirm("Event löschen?")) return;
+    let events = JSON.parse(localStorage.getItem("mia_events")) || [];
+    events = events.filter(e => e.id !== id);
+    localStorage.setItem("mia_events", JSON.stringify(events));
+    renderEvents();
 }
+
+function closeAll(){
+    document.querySelectorAll(".modal").forEach(m=>m.classList.add("hidden"));
+    document.getElementById("globalOverlay").classList.add("hidden");
+}
+
+/* ================= IMAGE UPLOAD ================= */
+
+uploadArea.onclick = ()=> imageInput.click();
+
+imageInput.onchange = e=>{
+    const reader = new FileReader();
+    reader.onload = ev=>{
+        uploadedImage = ev.target.result;
+        imagePreview.src = uploadedImage;
+        imagePreview.style.display="block";
+    };
+    reader.readAsDataURL(e.target.files[0]);
+};
+
+uploadArea.ondragover = e=>{
+    e.preventDefault();
+    uploadArea.classList.add("dragging");
+};
+
+uploadArea.ondrop = e=>{
+    e.preventDefault();
+    uploadArea.classList.remove("dragging");
+    const reader = new FileReader();
+    reader.onload = ev=>{
+        uploadedImage = ev.target.result;
+        imagePreview.src = uploadedImage;
+        imagePreview.style.display="block";
+    };
+    reader.readAsDataURL(e.dataTransfer.files[0]);
+};
 
 </script>
 
