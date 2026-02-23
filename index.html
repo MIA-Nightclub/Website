@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>MIA Nightclub System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>MIA Nightclub System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -15,114 +15,46 @@
     <div class="login-box">
         <input type="text" id="usernameInput" placeholder="Benutzername">
         <input type="password" placeholder="Passwort">
-        <button class="login-btn" id="loginBtn">Login</button>
-        <button class="register-btn">Registrieren</button>
-    </div>
-
-    <div class="register-overlay" id="registerOverlay">
-        <div class="register-box">
-            <h2>Registrieren</h2>
-            <input type="text" placeholder="Benutzername">
-            <input type="password" placeholder="Passwort">
-            <input type="password" placeholder="Passwort wiederholen">
-            <button class="login-btn">Account erstellen</button>
-            <button class="close-btn" id="closeRegister">Abbrechen</button>
-        </div>
+        <button class="login-btn" onclick="fakeLogin()">Login</button>
     </div>
 </div>
 
 <script>
 
-/* ================= USER SYSTEM ================= */
+/* ================= USER ================= */
 
 const USERS = [
     { username: "melven", role: "god" },
     { username: "kevin", role: "superadmin" },
-    { username: "lisa", role: "admin" },
-    { username: "max", role: "barkeeper" },
-    { username: "tom", role: "runner" }
+    { username: "lisa", role: "admin" }
 ];
 
 let currentUser = null;
-
-/* ================= INIT ================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const overlay = document.getElementById("registerOverlay");
-    const registerBtn = document.querySelector(".register-btn");
-    const closeBtn = document.getElementById("closeRegister");
-    const loginBtn = document.getElementById("loginBtn");
-
-    if (registerBtn) {
-        registerBtn.addEventListener("click", () => {
-            overlay.classList.add("active");
-        });
-    }
-
-    if (closeBtn) {
-        closeBtn.addEventListener("click", () => {
-            overlay.classList.remove("active");
-        });
-    }
-
-    if (overlay) {
-        overlay.addEventListener("click", (e) => {
-            if (e.target === overlay) {
-                overlay.classList.remove("active");
-            }
-        });
-    }
-
-    if (loginBtn) {
-        loginBtn.addEventListener("click", fakeLogin);
-    }
-
-});
+let uploadedImageData = null;
+let editingEventId = null;
 
 /* ================= LOGIN ================= */
 
 function fakeLogin() {
+    const username = document.getElementById("usernameInput").value.toLowerCase();
+    const found = USERS.find(u => u.username === username);
 
-    const usernameInput = document
-        .getElementById("usernameInput")
-        .value
-        .toLowerCase();
-
-    const foundUser = USERS.find(user => user.username === usernameInput);
-
-    if (!foundUser) {
+    if (!found) {
         alert("Unbekannter Benutzer");
         return;
     }
 
-    currentUser = foundUser;
+    currentUser = found;
     showInfoScreen();
 }
 
-/* ================= EVENT SCREEN ================= */
+/* ================= INFO SCREEN ================= */
 
 function showInfoScreen() {
 
-    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [
-        {
-            id: 1,
-            title: "Techno Night",
-            date: "2026-12-31",
-            description: "Hard Techno & Neon Vibes",
-            image: "https://picsum.photos/800/500?1"
-        },
-        {
-            id: 2,
-            title: "Latin Party",
-            date: "2026-12-28",
-            description: "Reggaeton & Latin Hits",
-            image: "https://picsum.photos/800/500?2"
-        }
-    ];
+    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
 
     const today = new Date().toISOString().split("T")[0];
-
     EVENTS = EVENTS.filter(e => e.date >= today);
     EVENTS.sort((a,b) => new Date(a.date) - new Date(b.date));
     EVENTS = EVENTS.slice(0,6);
@@ -130,37 +62,34 @@ function showInfoScreen() {
     localStorage.setItem("mia_events", JSON.stringify(EVENTS));
 
     document.body.innerHTML = `
-        <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
-
         <div class="top-bar">
             <div class="hamburger" onclick="toggleMenu()">☰</div>
         </div>
 
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">MIA System</div>
-
-            <div class="menu-item">Info</div>
-            <div class="menu-item">Barkeeper</div>
-            <div class="menu-item">Runner</div>
-            <div class="menu-item">Getränkekarte</div>
-            <div class="menu-item">Einstellungen</div>
-
-            ${currentUser.role === "god" ? `<div class="menu-item god-mode">GOD Mode</div>` : ""}
-            ${currentUser.role === "superadmin" || currentUser.role === "god" ? `<div class="menu-item">Mitarbeiter</div>` : ""}
-
+            ${currentUser.role === "god" ? `<div class="menu-item god-mode" onclick="openGodGate()">GOD Mode</div>` : ""}
             <div class="menu-divider"></div>
             <div class="menu-item logout-item" onclick="logout()">Logout</div>
         </div>
 
         <div class="event-container">
             ${EVENTS.map((event, index) => `
-                <div class="event-card ${index === 0 ? "today" : ""}">
+                <div class="event-card ${index===0?'today':''}">
                     <div class="event-bg" style="background-image:url('${event.image}')"></div>
                     <div class="event-content">
                         <img src="${event.image}" class="event-image">
                         <h2>${event.title}</h2>
                         <p>${event.date}</p>
                         <p>${event.description}</p>
+                        ${
+                            currentUser.role === "god" || currentUser.role === "superadmin"
+                            ? `<div class="event-actions">
+                                    <button onclick="editEvent(${event.id})">✏</button>
+                                    <button onclick="deleteEvent(${event.id})">🗑</button>
+                               </div>`
+                            : ""
+                        }
                     </div>
                 </div>
             `).join("")}
@@ -172,88 +101,177 @@ function showInfoScreen() {
             : ""
         }
 
+        <!-- EVENT MODAL -->
         <div class="glass-modal" id="eventModal">
             <div class="glass-modal-content">
-                <h2>Neues Event</h2>
+                <h2 id="modalTitle">Neues Event</h2>
                 <input type="text" id="eventTitle" placeholder="Titel">
                 <input type="date" id="eventDate">
-                <input type="text" id="eventImage" placeholder="Bild URL">
+
+                <div class="upload-area" id="uploadArea">
+                    <p>Bild hier reinziehen oder klicken</p>
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                </div>
+
+                <img id="imagePreview" class="image-preview">
+
                 <textarea id="eventDesc" placeholder="Beschreibung"></textarea>
 
                 <button class="login-btn" onclick="saveEvent()">Speichern</button>
                 <button class="close-btn" onclick="closeEventModal()">Abbrechen</button>
             </div>
         </div>
+
+        <!-- GOD PIN MODAL -->
+        <div class="glass-modal" id="godModal">
+            <div class="glass-modal-content">
+                <h2>GOD PIN</h2>
+                <input type="password" id="godPinInput" placeholder="4-stelliger PIN">
+                <button class="login-btn" onclick="checkGodPin()">Bestätigen</button>
+                <button class="close-btn" onclick="closeGodGate()">Abbrechen</button>
+            </div>
+        </div>
     `;
+
+    setTimeout(setupImageUpload, 50);
 }
 
 /* ================= MENU ================= */
 
-window.toggleMenu = function () {
-    const menu = document.getElementById("sideMenu");
-    const overlay = document.getElementById("menuOverlay");
+function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("active");
+}
 
-    if (!menu || !overlay) return;
+function logout() {
+    location.reload();
+}
 
-    menu.classList.toggle("active");
-    overlay.classList.toggle("active");
-};
+/* ================= GOD PIN ================= */
 
-window.closeMenu = function () {
-    const menu = document.getElementById("sideMenu");
-    const overlay = document.getElementById("menuOverlay");
+function openGodGate() {
+    document.getElementById("godModal").classList.add("active");
+}
 
-    if (!menu || !overlay) return;
+function closeGodGate() {
+    document.getElementById("godModal").classList.remove("active");
+}
 
-    menu.classList.remove("active");
-    overlay.classList.remove("active");
-};
+function checkGodPin() {
+    const pin = document.getElementById("godPinInput").value;
+    if (pin === "1337") {
+        alert("Willkommen im GOD Dashboard 😎");
+        closeGodGate();
+    } else {
+        alert("Falscher PIN");
+    }
+}
 
-window.logout = function () {
-    currentUser = null;
-    window.location.reload();
-};
+/* ================= IMAGE UPLOAD ================= */
 
-/* ================= EVENT MODAL ================= */
+function setupImageUpload() {
+    const uploadArea = document.getElementById("uploadArea");
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("imagePreview");
 
-window.openEventModal = function () {
+    if (!uploadArea) return;
+
+    uploadArea.onclick = () => imageInput.click();
+
+    imageInput.onchange = e => handleFile(e.target.files[0]);
+
+    uploadArea.ondragover = e => {
+        e.preventDefault();
+        uploadArea.classList.add("dragging");
+    };
+
+    uploadArea.ondragleave = () => uploadArea.classList.remove("dragging");
+
+    uploadArea.ondrop = e => {
+        e.preventDefault();
+        uploadArea.classList.remove("dragging");
+        handleFile(e.dataTransfer.files[0]);
+    };
+
+    function handleFile(file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            uploadedImageData = event.target.result;
+            preview.src = uploadedImageData;
+            preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+/* ================= EVENTS ================= */
+
+function openEventModal() {
+    editingEventId = null;
+    uploadedImageData = null;
+    document.getElementById("modalTitle").innerText = "Neues Event";
     document.getElementById("eventModal").classList.add("active");
-};
+}
 
-window.closeEventModal = function () {
+function closeEventModal() {
     document.getElementById("eventModal").classList.remove("active");
-};
+}
 
-window.saveEvent = function () {
+function saveEvent() {
 
     let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
 
-    const newEvent = {
-        id: Date.now(),
+    const eventData = {
+        id: editingEventId || Date.now(),
         title: document.getElementById("eventTitle").value,
         date: document.getElementById("eventDate").value,
-        image: document.getElementById("eventImage").value || "https://picsum.photos/800/500",
-        description: document.getElementById("eventDesc").value
+        description: document.getElementById("eventDesc").value,
+        image: uploadedImageData || ""
     };
 
-    if (!newEvent.title || !newEvent.date) {
-        alert("Titel und Datum sind Pflicht!");
+    if (!eventData.title || !eventData.date) {
+        alert("Titel & Datum sind Pflicht!");
         return;
     }
 
-    EVENTS.push(newEvent);
-
-    const today = new Date().toISOString().split("T")[0];
-
-    EVENTS = EVENTS.filter(e => e.date >= today);
-    EVENTS.sort((a,b) => new Date(a.date) - new Date(b.date));
-    EVENTS = EVENTS.slice(0,6);
+    if (editingEventId) {
+        EVENTS = EVENTS.map(e => e.id === editingEventId ? eventData : e);
+    } else {
+        EVENTS.push(eventData);
+    }
 
     localStorage.setItem("mia_events", JSON.stringify(EVENTS));
-
     closeEventModal();
     showInfoScreen();
-};
+}
+
+function editEvent(id) {
+    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
+    const event = EVENTS.find(e => e.id === id);
+
+    editingEventId = id;
+    uploadedImageData = event.image;
+
+    document.getElementById("modalTitle").innerText = "Event bearbeiten";
+    document.getElementById("eventTitle").value = event.title;
+    document.getElementById("eventDate").value = event.date;
+    document.getElementById("eventDesc").value = event.description;
+
+    const preview = document.getElementById("imagePreview");
+    preview.src = event.image;
+    preview.style.display = "block";
+
+    document.getElementById("eventModal").classList.add("active");
+}
+
+function deleteEvent(id) {
+    if (!confirm("Event wirklich löschen?")) return;
+
+    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
+    EVENTS = EVENTS.filter(e => e.id !== id);
+
+    localStorage.setItem("mia_events", JSON.stringify(EVENTS));
+    showInfoScreen();
+}
 
 </script>
 
