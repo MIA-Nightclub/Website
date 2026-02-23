@@ -269,7 +269,20 @@ input:focus {
     font-weight: bold;
 }
 
+.menu-divider {
+    height: 1px;
+    margin: 15px 20px;
+    background: rgba(255,255,255,0.1);
+}
 
+.logout-item {
+    color: #ff4d4d;
+    font-weight: 600;
+}
+
+.logout-item:hover {
+    background: rgba(255, 0, 0, 0.2);
+}
 
 
 
