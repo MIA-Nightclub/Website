@@ -359,6 +359,35 @@ input:focus {
     height: 80px;
 }
 
+.event-actions {
+    margin-top: 10px;
+}
 
+.event-actions button {
+    margin: 5px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.upload-area {
+    border: 2px dashed rgba(255,255,255,0.3);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 15px 0;
+    cursor: pointer;
+}
+
+.upload-area.dragging {
+    border-color: #a100ff;
+}
+
+.image-preview {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 15px;
+    display: none;
+}
 
 
