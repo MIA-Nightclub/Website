@@ -190,6 +190,12 @@ function toggleMenu() {
     if (menu) {
         menu.classList.toggle("active");
     }
+function logout() {
+    closeMenu();
+    currentUser = null;
+    location.reload();
+    }
+    
 }
 
 </script>
