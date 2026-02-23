@@ -33,9 +33,7 @@
 
 <script>
 
-/* ===========================
-   USER SYSTEM
-=========================== */
+/* ================= USER SYSTEM ================= */
 
 const USERS = [
     { username: "melven", role: "god" },
@@ -47,9 +45,7 @@ const USERS = [
 
 let currentUser = null;
 
-/* ===========================
-   INIT
-=========================== */
+/* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -84,9 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-/* ===========================
-   LOGIN
-=========================== */
+/* ================= LOGIN ================= */
 
 function fakeLogin() {
 
@@ -106,9 +100,7 @@ function fakeLogin() {
     showInfoScreen();
 }
 
-/* ===========================
-   EVENT SCREEN
-=========================== */
+/* ================= EVENT SCREEN ================= */
 
 function showInfoScreen() {
 
@@ -131,7 +123,7 @@ function showInfoScreen() {
 
     const today = new Date().toISOString().split("T")[0];
 
-    EVENTS = EVENTS.filter(event => event.date >= today);
+    EVENTS = EVENTS.filter(e => e.date >= today);
     EVENTS.sort((a,b) => new Date(a.date) - new Date(b.date));
     EVENTS = EVENTS.slice(0,6);
 
@@ -173,12 +165,29 @@ function showInfoScreen() {
                 </div>
             `).join("")}
         </div>
+
+        ${
+            currentUser.role === "god" || currentUser.role === "superadmin"
+            ? `<div class="glass-add-btn" onclick="openEventModal()">+</div>`
+            : ""
+        }
+
+        <div class="glass-modal" id="eventModal">
+            <div class="glass-modal-content">
+                <h2>Neues Event</h2>
+                <input type="text" id="eventTitle" placeholder="Titel">
+                <input type="date" id="eventDate">
+                <input type="text" id="eventImage" placeholder="Bild URL">
+                <textarea id="eventDesc" placeholder="Beschreibung"></textarea>
+
+                <button class="login-btn" onclick="saveEvent()">Speichern</button>
+                <button class="close-btn" onclick="closeEventModal()">Abbrechen</button>
+            </div>
+        </div>
     `;
 }
 
-/* ===========================
-   MENU FUNCTIONS
-=========================== */
+/* ================= MENU ================= */
 
 window.toggleMenu = function () {
     const menu = document.getElementById("sideMenu");
@@ -203,6 +212,47 @@ window.closeMenu = function () {
 window.logout = function () {
     currentUser = null;
     window.location.reload();
+};
+
+/* ================= EVENT MODAL ================= */
+
+window.openEventModal = function () {
+    document.getElementById("eventModal").classList.add("active");
+};
+
+window.closeEventModal = function () {
+    document.getElementById("eventModal").classList.remove("active");
+};
+
+window.saveEvent = function () {
+
+    let EVENTS = JSON.parse(localStorage.getItem("mia_events")) || [];
+
+    const newEvent = {
+        id: Date.now(),
+        title: document.getElementById("eventTitle").value,
+        date: document.getElementById("eventDate").value,
+        image: document.getElementById("eventImage").value || "https://picsum.photos/800/500",
+        description: document.getElementById("eventDesc").value
+    };
+
+    if (!newEvent.title || !newEvent.date) {
+        alert("Titel und Datum sind Pflicht!");
+        return;
+    }
+
+    EVENTS.push(newEvent);
+
+    const today = new Date().toISOString().split("T")[0];
+
+    EVENTS = EVENTS.filter(e => e.date >= today);
+    EVENTS.sort((a,b) => new Date(a.date) - new Date(b.date));
+    EVENTS = EVENTS.slice(0,6);
+
+    localStorage.setItem("mia_events", JSON.stringify(EVENTS));
+
+    closeEventModal();
+    showInfoScreen();
 };
 
 </script>
