@@ -1,3 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>MIA Nightclub System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- ================= LOGIN VIEW ================= -->
+
+<div id="loginView" class="view active">
+
+    <h1 class="logo">MIA</h1>
+    <p class="subtitle">nightclub system</p>
+
+    <div class="login-box">
+        <input id="usernameInput" type="text" placeholder="Benutzername">
+        <button class="login-btn" onclick="login()">Login</button>
+        <button class="register-btn" onclick="openRegister()">Registrieren</button>
+    </div>
+
+</div>
+
+<!-- ================= MAIN VIEW ================= -->
+
+<div id="mainView" class="view">
+
+    <div class="top-bar">
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+    </div>
+
+    <div id="sideMenu" class="side-menu">
+        <div class="menu-header">MIA System</div>
+        <div class="menu-item">Info</div>
+        <div class="menu-item">Barkeeper</div>
+        <div class="menu-item">Runner</div>
+        <div class="menu-item">Getränkekarte</div>
+        <div class="menu-item">Einstellungen</div>
+        <div class="menu-divider"></div>
+        <div id="godMenuItem" class="menu-item god-mode hidden" onclick="openGodGate()">GOD Mode</div>
+        <div class="menu-item logout-item" onclick="logout()">Logout</div>
+    </div>
+
+    <div id="eventContainer" class="event-container"></div>
+
+    <div id="addButton" class="glass-add-btn hidden" onclick="openEventModal()">+</div>
+
+</div>
+
+<!-- ================= REGISTER MODAL ================= -->
+
+<div id="registerModal" class="modal hidden">
+    <div class="modal-box">
+        <h2>Registrieren</h2>
+        <input type="text" placeholder="Benutzername">
+        <input type="password" placeholder="Passwort">
+        <button class="login-btn">Account erstellen</button>
+    </div>
+</div>
+
+<!-- ================= EVENT MODAL ================= -->
+
+<div id="eventModal" class="modal hidden">
+    <div class="modal-box">
+        <h2>Neues Event</h2>
+        <input id="eventTitle" type="text" placeholder="Titel">
+        <input id="eventDate" type="date">
+        <textarea id="eventDesc" placeholder="Beschreibung"></textarea>
+
+        <div id="uploadArea" class="upload-area">
+            Bild hier klicken
+        </div>
+
+        <input type="file" id="imageInput" hidden>
+        <img id="imagePreview" class="image-preview">
+
+        <button class="login-btn" onclick="saveEvent()">Speichern</button>
+    </div>
+</div>
+
+<!-- ================= GOD PIN MODAL ================= -->
+
+<div id="godModal" class="modal hidden">
+    <div class="modal-box">
+        <h2>GOD PIN</h2>
+        <input id="godPinInput" type="password" placeholder="4-stelliger PIN">
+        <button class="login-btn" onclick="checkGodPin()">Bestätigen</button>
+    </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+
 <script>
 
 const USERS = [
@@ -7,59 +102,52 @@ const USERS = [
 
 let currentUser = null;
 let uploadedImage = null;
-let editingEventId = null;
-
-/* ================= VIEW ================= */
-
-function showView(id) {
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-}
 
 /* ================= LOGIN ================= */
 
 function login() {
-    const name = document.getElementById("usernameInput").value.toLowerCase();
+    const name = usernameInput.value.toLowerCase();
     const user = USERS.find(u => u.username === name);
     if (!user) return alert("Unbekannter Benutzer");
 
     currentUser = user;
-    showView("mainView");
-    initMainUI();
+    loginView.classList.remove("active");
+    mainView.classList.add("active");
+
+    if (user.role === "god" || user.role === "superadmin") {
+        addButton.classList.remove("hidden");
+    }
+
+    if (user.role === "god") {
+        godMenuItem.classList.remove("hidden");
+    }
+
+    renderEvents();
 }
 
 function logout() {
     location.reload();
 }
 
-/* ================= MAIN ================= */
+/* ================= MENU ================= */
 
-function initMainUI() {
-    if (currentUser.role === "god" || currentUser.role === "superadmin") {
-        document.getElementById("addButton").classList.remove("hidden");
-    }
-
-    if (currentUser.role === "god") {
-        document.getElementById("godMenuItem").classList.remove("hidden");
-    }
-
-    renderEvents();
+function toggleMenu() {
+    sideMenu.classList.toggle("active");
 }
 
 /* ================= EVENTS ================= */
 
 function renderEvents() {
     let events = JSON.parse(localStorage.getItem("mia_events")) || [];
-    const today = new Date().toISOString().split("T")[0];
 
+    const today = new Date().toISOString().split("T")[0];
     events = events.filter(e => e.date >= today);
     events.sort((a,b)=>new Date(a.date)-new Date(b.date));
     events = events.slice(0,6);
 
     localStorage.setItem("mia_events", JSON.stringify(events));
 
-    const container = document.getElementById("eventContainer");
-    container.innerHTML = events.map((event, i) => `
+    eventContainer.innerHTML = events.map((event,i)=>`
         <div class="event-card ${i===0?'today':''}">
             <div class="event-bg" style="background-image:url('${event.image}')"></div>
             <div class="event-content">
@@ -68,10 +156,9 @@ function renderEvents() {
                 <p>${event.date}</p>
                 <p>${event.description}</p>
                 ${
-                    currentUser.role === "god" || currentUser.role === "superadmin"
+                    currentUser.role==="god" || currentUser.role==="superadmin"
                     ? `<div class="event-actions">
-                           <button onclick="editEvent(${event.id})">Bearbeiten</button>
-                           <button onclick="deleteEvent(${event.id})">Löschen</button>
+                         <button onclick="deleteEvent(${event.id})">Löschen</button>
                        </div>`
                     : ""
                 }
@@ -84,7 +171,7 @@ function saveEvent() {
     let events = JSON.parse(localStorage.getItem("mia_events")) || [];
 
     const newEvent = {
-        id: editingEventId || Date.now(),
+        id: Date.now(),
         title: eventTitle.value,
         date: eventDate.value,
         description: eventDesc.value,
@@ -93,113 +180,83 @@ function saveEvent() {
 
     if (!newEvent.title || !newEvent.date) return alert("Titel & Datum Pflicht");
 
-    if (editingEventId) {
-        events = events.map(e => e.id === editingEventId ? newEvent : e);
-    } else {
-        events.push(newEvent);
-    }
-
+    events.push(newEvent);
     localStorage.setItem("mia_events", JSON.stringify(events));
+
     closeAll();
     renderEvents();
 }
 
-function editEvent(id) {
-    const events = JSON.parse(localStorage.getItem("mia_events")) || [];
-    const event = events.find(e => e.id === id);
-
-    editingEventId = id;
-    eventTitle.value = event.title;
-    eventDate.value = event.date;
-    eventDesc.value = event.description;
-    uploadedImage = event.image;
-    imagePreview.src = event.image;
-    imagePreview.style.display="block";
-
-    openEventModal();
-}
-
 function deleteEvent(id) {
-    if (!confirm("Event löschen?")) return;
     let events = JSON.parse(localStorage.getItem("mia_events")) || [];
-    events = events.filter(e => e.id !== id);
+    events = events.filter(e=>e.id!==id);
     localStorage.setItem("mia_events", JSON.stringify(events));
     renderEvents();
 }
 
 /* ================= MODALS ================= */
 
-function openRegister() {
-    document.getElementById("registerModal").classList.remove("hidden");
-}
-
-function openEventModal() {
-    editingEventId = null;
-    document.getElementById("eventModal").classList.remove("hidden");
-}
-
-function openGodGate() {
-    document.getElementById("godModal").classList.remove("hidden");
-}
+function openRegister(){ registerModal.classList.remove("hidden"); }
+function openEventModal(){ eventModal.classList.remove("hidden"); }
+function openGodGate(){ godModal.classList.remove("hidden"); }
 
 function closeAll(){
     document.querySelectorAll(".modal").forEach(m=>m.classList.add("hidden"));
-    document.getElementById("sideMenu").classList.remove("active");
+    sideMenu.classList.remove("active");
 }
 
-/* ================= OUTSIDE CLICK HANDLING ================= */
+/* ================= GOD PIN ================= */
 
-document.addEventListener("click", function (e) {
-
-    /* Modal schließen wenn außerhalb modal-box */
-    document.querySelectorAll(".modal").forEach(modal => {
-        const box = modal.querySelector(".modal-box");
-        if (!modal.classList.contains("hidden")) {
-            if (!box.contains(e.target)) {
-                modal.classList.add("hidden");
-            }
-        }
-    });
-
-    /* Menü schließen wenn außerhalb */
-    const menu = document.getElementById("sideMenu");
-    const hamburger = document.querySelector(".hamburger");
-
-    if (menu.classList.contains("active") &&
-        !menu.contains(e.target) &&
-        !hamburger.contains(e.target)) {
-        menu.classList.remove("active");
-    }
-});
-
-/* ================= MENU ================= */
-
-function toggleMenu() {
-    document.getElementById("sideMenu").classList.toggle("active");
-}
-
-/* ================= GOD ================= */
-
-function checkGodPin() {
-    if (godPinInput.value === "1337") {
+function checkGodPin(){
+    if(godPinInput.value==="1337"){
         alert("GOD Dashboard coming soon 😎");
     } else {
         alert("Falscher PIN");
     }
 }
 
-/* ================= IMAGE UPLOAD ================= */
+/* ================= OUTSIDE CLICK ================= */
 
-uploadArea.onclick = ()=> imageInput.click();
+document.addEventListener("click", function(e){
 
-imageInput.onchange = e=>{
-    const reader = new FileReader();
-    reader.onload = ev=>{
-        uploadedImage = ev.target.result;
-        imagePreview.src = uploadedImage;
-        imagePreview.style.display="block";
-    };
-    reader.readAsDataURL(e.target.files[0]);
-};
+    document.querySelectorAll(".modal").forEach(modal=>{
+        const box = modal.querySelector(".modal-box");
+        if(!modal.classList.contains("hidden")){
+            if(!box.contains(e.target)){
+                modal.classList.add("hidden");
+            }
+        }
+    });
+
+    if(sideMenu.classList.contains("active") &&
+       !sideMenu.contains(e.target) &&
+       !e.target.classList.contains("hamburger")){
+        sideMenu.classList.remove("active");
+    }
+
+});
+
+/* ================= IMAGE UPLOAD SAFE ================= */
+
+document.addEventListener("click", function(e){
+    if(e.target.id==="uploadArea"){
+        imageInput.click();
+    }
+});
+
+document.addEventListener("change", function(e){
+    if(e.target.id==="imageInput"){
+        const reader = new FileReader();
+        reader.onload = function(ev){
+            uploadedImage = ev.target.result;
+            imagePreview.src = uploadedImage;
+            imagePreview.style.display="block";
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
 
 </script>
+
+</body>
+</html>
