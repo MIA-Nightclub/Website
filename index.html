@@ -1,100 +1,3 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>MIA Nightclub System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<div id="app">
-
-    <!-- GLOBAL OVERLAY -->
-    <div id="globalOverlay" class="overlay hidden"></div>
-
-    <!-- LOGIN VIEW -->
-    <div id="loginView" class="view active">
-        <h1 class="logo">MIA</h1>
-        <p class="subtitle">nightclub system</p>
-
-        <div class="login-box">
-            <input type="text" id="usernameInput" placeholder="Benutzername">
-            <input type="password" placeholder="Passwort">
-
-            <button class="login-btn" onclick="login()">Login</button>
-            <button class="register-btn" onclick="openRegister()">Registrieren</button>
-        </div>
-    </div>
-
-    <!-- MAIN VIEW -->
-    <div id="mainView" class="view">
-
-        <div class="top-bar">
-            <div class="hamburger" onclick="toggleMenu()">☰</div>
-        </div>
-
-        <div id="eventContainer" class="event-container"></div>
-
-        <div id="addButton" class="glass-add-btn hidden" onclick="openEventModal()">+</div>
-    </div>
-
-    <!-- SIDE MENU -->
-    <div id="sideMenu" class="side-menu">
-        <div class="menu-header">MIA System</div>
-        <div class="menu-item">Info</div>
-        <div class="menu-item">Barkeeper</div>
-        <div class="menu-item">Runner</div>
-        <div class="menu-item">Getränkekarte</div>
-        <div class="menu-item">Einstellungen</div>
-        <div id="godMenuItem" class="menu-item god-mode hidden" onclick="openGodGate()">GOD Mode</div>
-        <div class="menu-divider"></div>
-        <div class="menu-item logout-item" onclick="logout()">Logout</div>
-    </div>
-
-    <!-- REGISTER MODAL -->
-    <div id="registerModal" class="modal hidden">
-        <div class="modal-box">
-            <h2>Registrieren</h2>
-            <input type="text" placeholder="Benutzername">
-            <input type="password" placeholder="Passwort">
-            <input type="password" placeholder="Passwort wiederholen">
-            <button class="login-btn">Account erstellen</button>
-        </div>
-    </div>
-
-    <!-- EVENT MODAL -->
-    <div id="eventModal" class="modal hidden">
-        <div class="modal-box">
-            <h2 id="modalTitle">Neues Event</h2>
-
-            <input type="text" id="eventTitle" placeholder="Titel">
-            <input type="date" id="eventDate">
-
-            <div id="uploadArea" class="upload-area">
-                <p>Bild hier reinziehen oder klicken</p>
-                <input type="file" id="imageInput" accept="image/*" hidden>
-            </div>
-
-            <img id="imagePreview" class="image-preview">
-
-            <textarea id="eventDesc" placeholder="Beschreibung"></textarea>
-
-            <button class="login-btn" onclick="saveEvent()">Speichern</button>
-        </div>
-    </div>
-
-    <!-- GOD PIN MODAL -->
-    <div id="godModal" class="modal hidden">
-        <div class="modal-box">
-            <h2>GOD PIN</h2>
-            <input type="password" id="godPinInput" placeholder="4-stelliger PIN">
-            <button class="login-btn" onclick="checkGodPin()">Bestätigen</button>
-        </div>
-    </div>
-
-</div>
-
 <script>
 
 const USERS = [
@@ -105,10 +8,6 @@ const USERS = [
 let currentUser = null;
 let uploadedImage = null;
 let editingEventId = null;
-
-const overlay = document.getElementById("globalOverlay");
-
-overlay.onclick = () => closeAll();
 
 /* ================= VIEW ================= */
 
@@ -232,31 +131,51 @@ function deleteEvent(id) {
 
 function openRegister() {
     document.getElementById("registerModal").classList.remove("hidden");
-    overlay.classList.remove("hidden");
 }
 
 function openEventModal() {
     editingEventId = null;
     document.getElementById("eventModal").classList.remove("hidden");
-    overlay.classList.remove("hidden");
 }
 
 function openGodGate() {
     document.getElementById("godModal").classList.remove("hidden");
-    overlay.classList.remove("hidden");
 }
 
 function closeAll(){
     document.querySelectorAll(".modal").forEach(m=>m.classList.add("hidden"));
     document.getElementById("sideMenu").classList.remove("active");
-    overlay.classList.add("hidden");
 }
+
+/* ================= OUTSIDE CLICK HANDLING ================= */
+
+document.addEventListener("click", function (e) {
+
+    /* Modal schließen wenn außerhalb modal-box */
+    document.querySelectorAll(".modal").forEach(modal => {
+        const box = modal.querySelector(".modal-box");
+        if (!modal.classList.contains("hidden")) {
+            if (!box.contains(e.target)) {
+                modal.classList.add("hidden");
+            }
+        }
+    });
+
+    /* Menü schließen wenn außerhalb */
+    const menu = document.getElementById("sideMenu");
+    const hamburger = document.querySelector(".hamburger");
+
+    if (menu.classList.contains("active") &&
+        !menu.contains(e.target) &&
+        !hamburger.contains(e.target)) {
+        menu.classList.remove("active");
+    }
+});
 
 /* ================= MENU ================= */
 
 function toggleMenu() {
     document.getElementById("sideMenu").classList.toggle("active");
-    overlay.classList.toggle("hidden");
 }
 
 /* ================= GOD ================= */
@@ -284,6 +203,3 @@ imageInput.onchange = e=>{
 };
 
 </script>
-
-</body>
-</html>
