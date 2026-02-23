@@ -47,7 +47,7 @@ body {
 }
 
 /* ===========================
-   LOGIN
+   LOGIN BOX
 =========================== */
 
 .login-box {
@@ -57,9 +57,11 @@ body {
     border-radius: 20px;
     backdrop-filter: blur(20px);
     box-shadow: 0 0 40px rgba(255, 0, 150, 0.2);
+    text-align: center;
 }
 
-input, textarea {
+input,
+textarea {
     width: 250px;
     padding: 15px;
     margin: 10px 0;
@@ -76,24 +78,43 @@ textarea {
     height: 80px;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
     box-shadow: 0 0 10px #a100ff;
 }
 
-.login-btn {
-    width: 100%;
+/* ===========================
+   BUTTONS (180px)
+=========================== */
+
+.login-btn,
+.register-btn {
+    width: 180px;
     padding: 12px;
     border-radius: 12px;
     border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 10px;
+}
+
+.login-btn {
     background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
     color: white;
     font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s ease;
 }
 
 .login-btn:hover {
     transform: scale(1.05);
+}
+
+.register-btn {
+    background: rgba(255,255,255,0.08);
+    color: white;
+}
+
+.register-btn:hover {
+    background: rgba(255,255,255,0.15);
 }
 
 /* ===========================
@@ -165,18 +186,6 @@ input:focus, textarea:focus {
 
 .logout-item {
     color: #ff4d4d;
-}
-
-/* ===========================
-   OVERLAY
-=========================== */
-
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    z-index: 1000;
 }
 
 /* ===========================
@@ -274,7 +283,7 @@ input:focus, textarea:focus {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1300;
+    z-index: 2000;
 }
 
 .modal-box {
