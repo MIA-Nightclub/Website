@@ -187,15 +187,23 @@ function showInfoScreen() {
 
 function toggleMenu() {
     const menu = document.getElementById("sideMenu");
-    if (menu) {
-        menu.classList.toggle("active");
+    const overlay = document.getElementById("menuOverlay");
+
+    if (!menu || !overlay) return;
+
+    if (menu.classList.contains("active")) {
+        menu.classList.remove("active");
+        overlay.classList.remove("active");
+    } else {
+        menu.classList.add("active");
+        overlay.classList.add("active");
     }
+}
+
 function logout() {
-    closeMenu();
     currentUser = null;
-    location.reload();
+    window.location.reload();
     }
-    
 }
 
 </script>
