@@ -34,13 +34,8 @@
 <script>
 
 /* ===========================
-   SYSTEM DATA
+   USER SYSTEM
 =========================== */
-
-const PERMISSIONS = {
-    VIEW_INFO: "view_info",
-    MANAGE_USERS: "manage_users"
-};
 
 const USERS = [
     { username: "melven", role: "god" },
@@ -143,7 +138,7 @@ function showInfoScreen() {
     localStorage.setItem("mia_events", JSON.stringify(EVENTS));
 
     document.body.innerHTML = `
-        <div class="menu-overlay" id="menuOverlay"></div>
+        <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 
         <div class="top-bar">
             <div class="hamburger" onclick="toggleMenu()">☰</div>
@@ -182,29 +177,33 @@ function showInfoScreen() {
 }
 
 /* ===========================
-   MENU
+   MENU FUNCTIONS
 =========================== */
 
-function toggleMenu() {
+window.toggleMenu = function () {
     const menu = document.getElementById("sideMenu");
     const overlay = document.getElementById("menuOverlay");
 
     if (!menu || !overlay) return;
 
-    if (menu.classList.contains("active")) {
-        menu.classList.remove("active");
-        overlay.classList.remove("active");
-    } else {
-        menu.classList.add("active");
-        overlay.classList.add("active");
-    }
-}
+    menu.classList.toggle("active");
+    overlay.classList.toggle("active");
+};
+
+window.closeMenu = function () {
+    const menu = document.getElementById("sideMenu");
+    const overlay = document.getElementById("menuOverlay");
+
+    if (!menu || !overlay) return;
+
+    menu.classList.remove("active");
+    overlay.classList.remove("active");
+};
 
 window.logout = function () {
     currentUser = null;
     window.location.reload();
 };
-}
 
 </script>
 
