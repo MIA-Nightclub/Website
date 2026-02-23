@@ -143,19 +143,26 @@ function showInfoScreen() {
     localStorage.setItem("mia_events", JSON.stringify(EVENTS));
 
     document.body.innerHTML = `
+        <div class="menu-overlay" id="menuOverlay"></div>
+
         <div class="top-bar">
             <div class="hamburger" onclick="toggleMenu()">☰</div>
         </div>
 
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">MIA System</div>
+
             <div class="menu-item">Info</div>
             <div class="menu-item">Barkeeper</div>
             <div class="menu-item">Runner</div>
             <div class="menu-item">Getränkekarte</div>
             <div class="menu-item">Einstellungen</div>
+
             ${currentUser.role === "god" ? `<div class="menu-item god-mode">GOD Mode</div>` : ""}
             ${currentUser.role === "superadmin" || currentUser.role === "god" ? `<div class="menu-item">Mitarbeiter</div>` : ""}
+
+            <div class="menu-divider"></div>
+            <div class="menu-item logout-item" onclick="logout()">Logout</div>
         </div>
 
         <div class="event-container">
