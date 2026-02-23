@@ -21,7 +21,9 @@
         <div class="login-box">
             <input type="text" id="usernameInput" placeholder="Benutzername">
             <input type="password" placeholder="Passwort">
+
             <button class="login-btn" onclick="login()">Login</button>
+            <button class="register-btn" onclick="openRegister()">Registrieren</button>
         </div>
     </div>
 
@@ -48,6 +50,17 @@
         <div id="godMenuItem" class="menu-item god-mode hidden" onclick="openGodGate()">GOD Mode</div>
         <div class="menu-divider"></div>
         <div class="menu-item logout-item" onclick="logout()">Logout</div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div id="registerModal" class="modal hidden">
+        <div class="modal-box">
+            <h2>Registrieren</h2>
+            <input type="text" placeholder="Benutzername">
+            <input type="password" placeholder="Passwort">
+            <input type="password" placeholder="Passwort wiederholen">
+            <button class="login-btn">Account erstellen</button>
+        </div>
     </div>
 
     <!-- EVENT MODAL -->
@@ -84,8 +97,6 @@
 
 <script>
 
-/* ================= SYSTEM ================= */
-
 const USERS = [
     { username: "melven", role: "god" },
     { username: "kevin", role: "superadmin" }
@@ -95,7 +106,11 @@ let currentUser = null;
 let uploadedImage = null;
 let editingEventId = null;
 
-/* ================= VIEW CONTROL ================= */
+const overlay = document.getElementById("globalOverlay");
+
+overlay.onclick = () => closeAll();
+
+/* ================= VIEW ================= */
 
 function showView(id) {
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
@@ -107,7 +122,6 @@ function showView(id) {
 function login() {
     const name = document.getElementById("usernameInput").value.toLowerCase();
     const user = USERS.find(u => u.username === name);
-
     if (!user) return alert("Unbekannter Benutzer");
 
     currentUser = user;
@@ -115,7 +129,11 @@ function login() {
     initMainUI();
 }
 
-/* ================= MAIN UI ================= */
+function logout() {
+    location.reload();
+}
+
+/* ================= MAIN ================= */
 
 function initMainUI() {
     if (currentUser.role === "god" || currentUser.role === "superadmin") {
@@ -132,7 +150,6 @@ function initMainUI() {
 /* ================= EVENTS ================= */
 
 function renderEvents() {
-
     let events = JSON.parse(localStorage.getItem("mia_events")) || [];
     const today = new Date().toISOString().split("T")[0];
 
@@ -151,7 +168,6 @@ function renderEvents() {
                 <h2>${event.title}</h2>
                 <p>${event.date}</p>
                 <p>${event.description}</p>
-
                 ${
                     currentUser.role === "god" || currentUser.role === "superadmin"
                     ? `<div class="event-actions">
@@ -164,44 +180,6 @@ function renderEvents() {
         </div>
     `).join("");
 }
-
-/* ================= MODALS ================= */
-
-function openEventModal() {
-    editingEventId = null;
-    document.getElementById("eventModal").classList.remove("hidden");
-    document.getElementById("globalOverlay").classList.remove("hidden");
-}
-
-function openGodGate() {
-    document.getElementById("godModal").classList.remove("hidden");
-    document.getElementById("globalOverlay").classList.remove("hidden");
-}
-
-document.getElementById("globalOverlay").onclick = () => {
-    document.querySelectorAll(".modal").forEach(m => m.classList.add("hidden"));
-    document.getElementById("sideMenu").classList.remove("active");
-    document.getElementById("globalOverlay").classList.add("hidden");
-};
-
-/* ================= MENU ================= */
-
-function toggleMenu() {
-    document.getElementById("sideMenu").classList.toggle("active");
-    document.getElementById("globalOverlay").classList.toggle("hidden");
-}
-
-/* ================= GOD ================= */
-
-function checkGodPin() {
-    if (document.getElementById("godPinInput").value === "1337") {
-        alert("GOD Dashboard coming soon 😎");
-    } else {
-        alert("Falscher PIN");
-    }
-}
-
-/* ================= SAVE / EDIT / DELETE ================= */
 
 function saveEvent() {
     let events = JSON.parse(localStorage.getItem("mia_events")) || [];
@@ -237,7 +215,7 @@ function editEvent(id) {
     eventDesc.value = event.description;
     uploadedImage = event.image;
     imagePreview.src = event.image;
-    imagePreview.style.display = "block";
+    imagePreview.style.display="block";
 
     openEventModal();
 }
@@ -250,9 +228,45 @@ function deleteEvent(id) {
     renderEvents();
 }
 
+/* ================= MODALS ================= */
+
+function openRegister() {
+    document.getElementById("registerModal").classList.remove("hidden");
+    overlay.classList.remove("hidden");
+}
+
+function openEventModal() {
+    editingEventId = null;
+    document.getElementById("eventModal").classList.remove("hidden");
+    overlay.classList.remove("hidden");
+}
+
+function openGodGate() {
+    document.getElementById("godModal").classList.remove("hidden");
+    overlay.classList.remove("hidden");
+}
+
 function closeAll(){
     document.querySelectorAll(".modal").forEach(m=>m.classList.add("hidden"));
-    document.getElementById("globalOverlay").classList.add("hidden");
+    document.getElementById("sideMenu").classList.remove("active");
+    overlay.classList.add("hidden");
+}
+
+/* ================= MENU ================= */
+
+function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("active");
+    overlay.classList.toggle("hidden");
+}
+
+/* ================= GOD ================= */
+
+function checkGodPin() {
+    if (godPinInput.value === "1337") {
+        alert("GOD Dashboard coming soon 😎");
+    } else {
+        alert("Falscher PIN");
+    }
 }
 
 /* ================= IMAGE UPLOAD ================= */
@@ -267,23 +281,6 @@ imageInput.onchange = e=>{
         imagePreview.style.display="block";
     };
     reader.readAsDataURL(e.target.files[0]);
-};
-
-uploadArea.ondragover = e=>{
-    e.preventDefault();
-    uploadArea.classList.add("dragging");
-};
-
-uploadArea.ondrop = e=>{
-    e.preventDefault();
-    uploadArea.classList.remove("dragging");
-    const reader = new FileReader();
-    reader.onload = ev=>{
-        uploadedImage = ev.target.result;
-        imagePreview.src = uploadedImage;
-        imagePreview.style.display="block";
-    };
-    reader.readAsDataURL(e.dataTransfer.files[0]);
 };
 
 </script>
