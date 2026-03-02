@@ -25,6 +25,7 @@
 <!-- ================= MAIN VIEW ================= -->
 
 <div id="mainView" class="view">
+
     <div class="top-bar">
         <div class="hamburger" onclick="toggleMenu()">☰</div>
     </div>
@@ -44,6 +45,7 @@
     <div id="eventContainer" class="event-container"></div>
 
     <div id="addButton" class="glass-add-btn hidden" onclick="openEventModal()">+</div>
+
 </div>
 
 <!-- ================= REGISTER MODAL ================= -->
@@ -85,6 +87,8 @@
 </div>
 
 <script>
+
+/* ================= USERS ================= */
 
 const USERS = [
     { username: "melven", role: "god" },
@@ -131,8 +135,8 @@ function toggleMenu() {
 
 function renderEvents() {
     let events = JSON.parse(localStorage.getItem("mia_events")) || [];
-    const today = new Date().toISOString().split("T")[0];
 
+    const today = new Date().toISOString().split("T")[0];
     events = events.filter(e => e.date >= today);
     events.sort((a,b)=>new Date(a.date)-new Date(b.date));
     events = events.slice(0,6);
