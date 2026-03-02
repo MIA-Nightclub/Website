@@ -10,7 +10,9 @@ body {
     overflow: hidden;
 }
 
-.hidden { display: none; }
+.hidden {
+    display: none;
+}
 
 .view {
     display: none;
@@ -21,6 +23,8 @@ body {
 .view.active {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ===========================
@@ -33,11 +37,10 @@ body {
     background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-align: center;
+    margin-bottom: 10px;
 }
 
 .subtitle {
-    text-align: center;
     letter-spacing: 4px;
     color: #aaa;
 }
@@ -48,18 +51,19 @@ body {
 
 .login-box {
     margin-top: 40px;
-    padding: 40px;
-    border-radius: 24px;
+    padding: 45px;
+    border-radius: 28px;
     backdrop-filter: blur(25px);
     background: rgba(255,255,255,0.05);
     text-align: center;
+    box-shadow: 0 0 40px rgba(255,0,150,0.2);
 }
 
 input, textarea {
     width: 260px;
     padding: 14px;
     margin: 10px 0;
-    border-radius: 14px;
+    border-radius: 16px;
     border: none;
     background: #1c1c22;
     color: white;
@@ -71,14 +75,25 @@ textarea {
     height: 90px;
 }
 
-.login-btn, .register-btn {
+input:focus,
+textarea:focus {
+    box-shadow: 0 0 12px #a100ff;
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+.login-btn,
+.register-btn {
     width: 180px;
     padding: 14px;
-    border-radius: 14px;
+    border-radius: 16px;
     border: none;
-    margin-top: 12px;
+    margin-top: 14px;
     cursor: pointer;
     font-size: 15px;
+    transition: 0.3s ease;
 }
 
 .login-btn {
@@ -87,9 +102,17 @@ textarea {
     font-weight: bold;
 }
 
+.login-btn:hover {
+    transform: scale(1.05);
+}
+
 .register-btn {
     background: rgba(255,255,255,0.1);
     color: white;
+}
+
+.register-btn:hover {
+    background: rgba(255,255,255,0.2);
 }
 
 /* ===========================
@@ -128,23 +151,44 @@ textarea {
     z-index: 1200;
 }
 
-.side-menu.active { right: 0; }
+.side-menu.active {
+    right: 0;
+}
+
+.menu-header {
+    padding: 20px 30px;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
 
 .menu-item {
     padding: 20px 30px;
     font-size: 18px;
     cursor: pointer;
+    transition: 0.3s ease;
 }
 
 .menu-item:hover {
     background: rgba(255,255,255,0.08);
 }
 
-.logout-item { color: #ff4d4d; }
-.god-mode { color: #ff004c; }
+.menu-divider {
+    height: 1px;
+    margin: 15px 25px;
+    background: rgba(255,255,255,0.1);
+}
+
+.logout-item {
+    color: #ff4d4d;
+}
+
+.god-mode {
+    color: #ff004c;
+    font-weight: bold;
+}
 
 /* ===========================
-   EVENT CONTAINER
+   EVENTS
 =========================== */
 
 .event-container {
@@ -169,7 +213,7 @@ textarea {
     height: 120%;
     background-size: cover;
     background-position: center;
-    filter: blur(45px);
+    filter: blur(50px);
     opacity: 0.4;
 }
 
@@ -182,30 +226,36 @@ textarea {
 
 .event-image {
     width: 100%;
-    max-height: 400px;
+    max-height: 420px;
     object-fit: cover;
-    border-radius: 25px;
+    border-radius: 28px;
+    margin-bottom: 20px;
 }
 
 /* ===========================
-   FLOATING BUTTON
+   FLOATING ADD BUTTON
 =========================== */
 
 .glass-add-btn {
     position: fixed;
     bottom: 40px;
     right: 40px;
-    width: 80px;
-    height: 80px;
+    width: 85px;
+    height: 85px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(25px);
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(30px);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    font-size: 42px;
     cursor: pointer;
-    box-shadow: 0 0 30px rgba(255,0,150,0.4);
+    box-shadow: 0 0 35px rgba(255,0,150,0.4);
+    transition: 0.3s ease;
+}
+
+.glass-add-btn:hover {
+    transform: scale(1.1);
 }
 
 /* ===========================
@@ -227,7 +277,7 @@ textarea {
     background: rgba(30,30,40,0.95);
     padding: 50px;
     border-radius: 30px;
-    width: 400px;
+    width: 420px;
     max-width: 90%;
 }
 
@@ -238,10 +288,16 @@ textarea {
 .upload-area {
     border: 2px dashed rgba(255,255,255,0.3);
     padding: 30px;
-    border-radius: 20px;
+    border-radius: 22px;
     margin: 15px 0;
     cursor: pointer;
     text-align: center;
+    transition: 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #a100ff;
+    background: rgba(161,0,255,0.1);
 }
 
 .image-preview {
@@ -252,7 +308,7 @@ textarea {
 }
 
 /* ===========================
-   IPAD LANDSCAPE OPTIMIERUNG
+   LANDSCAPE OPTIMIERUNG
 =========================== */
 
 @media (orientation: landscape) {
@@ -262,10 +318,14 @@ textarea {
     }
 
     .event-image {
-        max-height: 500px;
+        max-height: 520px;
     }
 
     .side-menu {
         width: 350px;
+    }
+
+    .modal-box {
+        width: 500px;
     }
 }
