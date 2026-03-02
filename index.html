@@ -12,23 +12,19 @@
 <!-- ================= LOGIN VIEW ================= -->
 
 <div id="loginView" class="view active">
-
     <h1 class="logo">MIA</h1>
     <p class="subtitle">nightclub system</p>
 
     <div class="login-box">
         <input id="usernameInput" type="text" placeholder="Benutzername">
-        <input pw="passwordInput" type="text" placeholder="Passwort">
         <button class="login-btn" onclick="login()">Login</button>
         <button class="register-btn" onclick="openRegister()">Registrieren</button>
     </div>
-
 </div>
 
 <!-- ================= MAIN VIEW ================= -->
 
 <div id="mainView" class="view">
-
     <div class="top-bar">
         <div class="hamburger" onclick="toggleMenu()">☰</div>
     </div>
@@ -48,7 +44,6 @@
     <div id="eventContainer" class="event-container"></div>
 
     <div id="addButton" class="glass-add-btn hidden" onclick="openEventModal()">+</div>
-
 </div>
 
 <!-- ================= REGISTER MODAL ================= -->
@@ -71,10 +66,7 @@
         <input id="eventDate" type="date">
         <textarea id="eventDesc" placeholder="Beschreibung"></textarea>
 
-        <div id="uploadArea" class="upload-area">
-            Bild hier klicken
-        </div>
-
+        <div id="uploadArea" class="upload-area">Bild auswählen</div>
         <input type="file" id="imageInput" hidden>
         <img id="imagePreview" class="image-preview">
 
@@ -82,7 +74,7 @@
     </div>
 </div>
 
-<!-- ================= GOD PIN MODAL ================= -->
+<!-- ================= GOD MODAL ================= -->
 
 <div id="godModal" class="modal hidden">
     <div class="modal-box">
@@ -91,8 +83,6 @@
         <button class="login-btn" onclick="checkGodPin()">Bestätigen</button>
     </div>
 </div>
-
-<!-- ================= SCRIPT ================= -->
 
 <script>
 
@@ -112,6 +102,7 @@ function login() {
     if (!user) return alert("Unbekannter Benutzer");
 
     currentUser = user;
+
     loginView.classList.remove("active");
     mainView.classList.add("active");
 
@@ -140,8 +131,8 @@ function toggleMenu() {
 
 function renderEvents() {
     let events = JSON.parse(localStorage.getItem("mia_events")) || [];
-
     const today = new Date().toISOString().split("T")[0];
+
     events = events.filter(e => e.date >= today);
     events.sort((a,b)=>new Date(a.date)-new Date(b.date));
     events = events.slice(0,6);
@@ -158,9 +149,7 @@ function renderEvents() {
                 <p>${event.description}</p>
                 ${
                     currentUser.role==="god" || currentUser.role==="superadmin"
-                    ? `<div class="event-actions">
-                         <button onclick="deleteEvent(${event.id})">Löschen</button>
-                       </div>`
+                    ? `<button onclick="deleteEvent(${event.id})">Löschen</button>`
                     : ""
                 }
             </div>
@@ -206,10 +195,10 @@ function closeAll(){
     sideMenu.classList.remove("active");
 }
 
-/* ================= GOD PIN ================= */
+/* ================= GOD ================= */
 
 function checkGodPin(){
-    if(godPinInput.value==="0712"){
+    if(godPinInput.value==="1337"){
         alert("GOD Dashboard coming soon 😎");
     } else {
         alert("Falscher PIN");
@@ -234,10 +223,9 @@ document.addEventListener("click", function(e){
        !e.target.classList.contains("hamburger")){
         sideMenu.classList.remove("active");
     }
-
 });
 
-/* ================= IMAGE UPLOAD SAFE ================= */
+/* ================= IMAGE UPLOAD ================= */
 
 document.addEventListener("click", function(e){
     if(e.target.id==="uploadArea"){
@@ -258,6 +246,5 @@ document.addEventListener("change", function(e){
 });
 
 </script>
-
 </body>
 </html>
