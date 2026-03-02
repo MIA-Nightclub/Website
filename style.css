@@ -1,7 +1,3 @@
-/* ===========================
-   BASE
-=========================== */
-
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -10,25 +6,10 @@ body {
     overflow: hidden;
 }
 
-.hidden {
-    display: none !important;
-}
+.hidden { display: none; }
 
-.view {
-    display: none;
-    height: 100vh;
-}
-
-.view.active {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ===========================
-   LOGO
-=========================== */
+.view { display: none; height: 100vh; }
+.view.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
 .logo {
     font-size: 90px;
@@ -36,90 +17,52 @@ body {
     background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 0;
 }
 
 .subtitle {
-    margin-top: 0;
-    color: #bbbbbb;
     letter-spacing: 4px;
-    font-size: 14px;
+    color: #aaa;
 }
-
-/* ===========================
-   LOGIN BOX
-=========================== */
 
 .login-box {
     margin-top: 40px;
-    background: rgba(255, 255, 255, 0.05);
     padding: 40px;
     border-radius: 20px;
     backdrop-filter: blur(20px);
-    box-shadow: 0 0 40px rgba(255, 0, 150, 0.2);
-    text-align: center;
+    background: rgba(255,255,255,0.05);
 }
 
-input,
-textarea {
+input, textarea {
     width: 250px;
-    padding: 15px;
-    margin: 10px 0;
+    padding: 12px;
+    margin: 8px 0;
     border-radius: 12px;
     border: none;
-    outline: none;
     background: #1c1c22;
     color: white;
-    font-size: 16px;
 }
 
-textarea {
-    resize: none;
-    height: 80px;
-}
+textarea { resize: none; height: 80px; }
 
-input:focus,
-textarea:focus {
-    box-shadow: 0 0 10px #a100ff;
-}
-
-/* ===========================
-   BUTTONS (180px)
-=========================== */
-
-.login-btn,
-.register-btn {
+.login-btn, .register-btn {
     width: 180px;
     padding: 12px;
     border-radius: 12px;
     border: none;
-    cursor: pointer;
-    transition: 0.3s ease;
     margin-top: 10px;
+    cursor: pointer;
 }
 
 .login-btn {
     background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
     color: white;
-    font-weight: 700;
-}
-
-.login-btn:hover {
-    transform: scale(1.05);
+    font-weight: bold;
 }
 
 .register-btn {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.1);
     color: white;
 }
-
-.register-btn:hover {
-    background: rgba(255,255,255,0.15);
-}
-
-/* ===========================
-   TOP BAR
-=========================== */
 
 .top-bar {
     position: fixed;
@@ -128,84 +71,43 @@ textarea:focus {
     padding: 20px;
     display: flex;
     justify-content: flex-end;
-    z-index: 1000;
 }
 
-.hamburger {
-    font-size: 28px;
-    cursor: pointer;
-}
-
-/* ===========================
-   SIDE MENU
-=========================== */
+.hamburger { font-size: 26px; cursor: pointer; }
 
 .side-menu {
     position: fixed;
     top: 0;
-    right: -280px;
-    width: 260px;
+    right: -260px;
+    width: 250px;
     height: 100%;
     background: rgba(20,20,30,0.95);
     backdrop-filter: blur(20px);
-    transition: 0.4s ease;
-    padding-top: 80px;
-    z-index: 1100;
-}
-
-.side-menu.active {
-    right: 0;
-}
-
-.menu-header {
-    font-weight: bold;
-    padding: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.menu-item {
-    padding: 15px 25px;
-    cursor: pointer;
     transition: 0.3s ease;
+    padding-top: 80px;
 }
 
-.menu-item:hover {
-    background: linear-gradient(90deg, #ff004c, #a100ff, #0066ff);
-}
+.side-menu.active { right: 0; }
 
-.god-mode {
-    color: #ff004c;
-    font-weight: bold;
-}
+.menu-item { padding: 15px 25px; cursor: pointer; }
+.menu-item:hover { background: rgba(255,255,255,0.1); }
 
-.menu-divider {
-    height: 1px;
-    margin: 10px 20px;
-    background: rgba(255,255,255,0.1);
-}
-
-.logout-item {
-    color: #ff4d4d;
-}
-
-/* ===========================
-   EVENT SCREEN
-=========================== */
+.logout-item { color: #ff4d4d; }
+.god-mode { color: #ff004c; }
 
 .event-container {
     height: 100vh;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
-    width: 100%;
 }
 
 .event-card {
-    position: relative;
     height: 100vh;
     scroll-snap-align: start;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 .event-bg {
@@ -213,9 +115,7 @@ textarea:focus {
     width: 120%;
     height: 120%;
     background-size: cover;
-    background-position: center;
     filter: blur(40px);
-    transform: scale(1.2);
     opacity: 0.4;
 }
 
@@ -228,27 +128,7 @@ textarea:focus {
 .event-image {
     width: 100%;
     border-radius: 20px;
-    margin-bottom: 20px;
 }
-
-.event-actions button {
-    margin: 5px;
-    padding: 8px 14px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    background: rgba(255,255,255,0.1);
-    color: white;
-    backdrop-filter: blur(10px);
-}
-
-.event-actions button:hover {
-    background: linear-gradient(90deg, #ff004c, #a100ff);
-}
-
-/* ===========================
-   FLOATING ADD BUTTON
-=========================== */
 
 .glass-add-btn {
     position: fixed;
@@ -257,25 +137,14 @@ textarea:focus {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    backdrop-filter: blur(20px);
     background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    font-size: 36px;
     cursor: pointer;
-    box-shadow: 0 0 25px rgba(255,0,150,0.4);
-    transition: 0.3s ease;
-    z-index: 1200;
 }
-
-.glass-add-btn:hover {
-    transform: scale(1.1);
-}
-
-/* ===========================
-   MODALS
-=========================== */
 
 .modal {
     position: fixed;
@@ -288,33 +157,21 @@ textarea:focus {
 
 .modal-box {
     background: rgba(30,30,40,0.95);
-    backdrop-filter: blur(20px);
     padding: 40px;
     border-radius: 20px;
-    text-align: center;
 }
-
-/* ===========================
-   IMAGE UPLOAD
-=========================== */
 
 .upload-area {
     border: 2px dashed rgba(255,255,255,0.3);
     padding: 20px;
-    border-radius: 15px;
-    margin: 15px 0;
+    border-radius: 12px;
+    margin: 10px 0;
     cursor: pointer;
-    transition: 0.3s ease;
-}
-
-.upload-area.dragging {
-    border-color: #a100ff;
-    background: rgba(161,0,255,0.1);
 }
 
 .image-preview {
     width: 100%;
     margin-top: 10px;
-    border-radius: 15px;
+    border-radius: 12px;
     display: none;
 }
